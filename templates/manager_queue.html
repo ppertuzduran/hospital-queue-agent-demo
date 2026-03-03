@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Colas — Manager{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title">
+            <i class="bi bi-layout-text-window-reverse me-2 text-primary"></i>Gestión de Colas
+        </h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" id="btnRefreshQueue" onclick="loadManagerQueue()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
+            </button>
+            <button class="btn btn-sm btn-link text-secondary p-1" id="btnResetDemo"
+                    onclick="resetDemo()" title="Reiniciar demo (vaciar cola)"
+                    style="opacity:0.55; line-height:1;" onmouseover="this.style.opacity='1'"
+                    onmouseout="this.style.opacity='0.55'">
+                <i class="bi bi-trash3" style="font-size:1rem;"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-6 col-md-3">
+            <div class="card table-card">
+                <div class="card-body py-3 text-center">
+                    <p class="text-muted small mb-1 text-uppercase fw-semibold">Atendiendo N°</p>
+                    <div id="kpiCurrentServing"
+                         style="font-size:2.25rem;font-weight:800;color:var(--dark-blue);">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card table-card">
+                <div class="card-body py-3 text-center">
+                    <p class="text-muted small mb-1 text-uppercase fw-semibold">En espera</p>
+                    <div id="kpiWaiting"
+                         style="font-size:2.25rem;font-weight:800;color:#fd7e14;">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card table-card">
+                <div class="card-body py-3 text-center">
+                    <p class="text-muted small mb-1 text-uppercase fw-semibold">Atendidas hoy</p>
+                    <div id="kpiServedToday"
+                         style="font-size:2.25rem;font-weight:800;color:#198754;">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="card table-card">
+                <div class="card-body py-3 text-center">
+                    <p class="text-muted small mb-1 text-uppercase fw-semibold">Promedio espera</p>
+                    <div id="kpiAvgWait"
+                         style="font-size:2.25rem;font-weight:800;color:#6c757d;">—</div>
+                    <p class="text-muted" style="font-size:0.7rem;margin-bottom:0;">minutos</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Queue table card -->
+    <div class="card table-card">
+        <div class="card-body p-0">
+            <div class="px-3 py-2 border-bottom bg-light d-flex justify-content-between align-items-center">
+                <span class="fw-semibold small text-muted text-uppercase">
+                    <i class="bi bi-list-columns-reverse me-1"></i>Cola de pacientes
+                </span>
+                <span class="badge bg-secondary" id="queueCount">0 en cola</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="managerQueueTable">
+                    <thead>
+                        <tr>
+                            <th style="width:70px;">Turno</th>
+                            <th>Nombre</th>
+                            <th>DNI</th>
+                            <th>Tipo de cita</th>
+                            <th>Hora llegada</th>
+                            <th style="width:100px;">Min. esp.</th>
+                            <th style="width:110px;">Estado</th>
+                            <th style="width:220px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="managerQueueBody">
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                Cargando cola…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-footer px-3 py-2">
+                <small class="text-muted" id="queueFooterInfo">
+                    La tabla se actualiza cada 5 segundos automáticamente.
+                </small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Toast notification container -->
+<div class="position-fixed bottom-0 start-50 translate-middle-x p-3" style="z-index:11000;">
+    <div id="actionToast" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="toastMessage">Acción completada.</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ request.url_for('static', path='js/manager_queue.js') }}?v=2"></script>
+{% endblock %}

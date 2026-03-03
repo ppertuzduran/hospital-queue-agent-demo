@@ -1,0 +1,27 @@
+# Virtual environment
+env/
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Sensitive config (API key lives here — use Railway env vars instead)
+config.json
+
+# Live database — ephemeral, auto-seeded on startup
+data/db.json
+data/db.json.tmp
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log

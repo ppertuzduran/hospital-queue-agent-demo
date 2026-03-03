@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Cola de Pacientes — Gestión de Colas{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title">
+            <i class="bi bi-person-walking me-2 text-primary"></i>Portal del Paciente
+        </h2>
+        <button class="btn btn-primary" onclick="toggleChatPanel('patient')">
+            <i class="bi bi-chat-dots-fill me-1"></i> Obtener mi turno
+        </button>
+    </div>
+
+    <!-- Top info row -->
+    <div class="row g-3 mb-4">
+
+        <!-- QR / Arrival card -->
+        <div class="col-md-4">
+            <div class="card table-card h-100">
+                <div class="card-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-qr-code" style="font-size:3.5rem;color:var(--dark-blue);"></i>
+                    </div>
+                    <h5 class="fw-semibold mb-2">¿Cómo obtener tu turno?</h5>
+                    <p class="text-muted small mb-3">
+                        Escanea el código QR en recepción o presiona el botón de abajo para iniciar el asistente de
+                        cola.
+                        El sistema te pedirá tu <strong>DNI / carnet de identidad</strong>, confirmará tu cita y te
+                        asignará un número de turno automáticamente.
+                    </p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="toggleChatPanel('patient')">
+                        <i class="bi bi-chat-dots me-1"></i>Iniciar asistente
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current serving card -->
+        <div class="col-md-4">
+            <div class="card table-card h-100">
+                <div class="card-body text-center py-4">
+                    <p class="text-muted small mb-1 text-uppercase fw-semibold">Atendiendo ahora</p>
+                    <div id="currentServingDisplay"
+                        style="font-size:4rem;font-weight:800;color:var(--dark-blue);line-height:1;">—</div>
+                    <p class="text-muted small mt-2 mb-0">N° de turno actual</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- My turn card -->
+        <div class="col-md-4">
+            <div class="card table-card h-100" id="myTurnCard">
+                <div class="card-body text-center py-4">
+                    <p class="text-muted small mb-1 text-uppercase fw-semibold">Tu turno</p>
+                    <div id="myTurnDisplay" style="font-size:4rem;font-weight:800;color:#198754;line-height:1;">—</div>
+                    <p class="text-muted small mt-1 mb-0" id="myWaitDisplay"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ request.url_for('static', path='js/patient_queue.js') }}?v=2"></script>
+{% endblock %}

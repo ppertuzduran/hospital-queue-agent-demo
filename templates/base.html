@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block extra_meta %}{% endblock %}
+    <title>{% block title %}Gestión de Colas{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS (mirrors project3 styles) -->
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/styles.css') }}">
+
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════
+       Floating Chat FABs + Panels  (identical to project3)
+    ═══════════════════════════════════════════════════════════ */
+        .chat-fab-stack {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9990;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .chat-fab {
+            pointer-events: all;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            outline: none;
+        }
+
+        .chat-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .chat-fab:active {
+            transform: scale(0.97);
+        }
+
+        .chat-fab::before {
+            content: attr(data-label);
+            position: absolute;
+            right: calc(100% + 10px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(33, 37, 41, 0.82);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-family: system-ui, sans-serif;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s;
+            letter-spacing: 0.02em;
+        }
+
+        .chat-fab:hover::before {
+            opacity: 1;
+        }
+
+        .chat-fab-patient {
+            background: #1a56db;
+            color: #fff;
+        }
+
+        .chat-fab-manager {
+            background: #198754;
+            color: #fff;
+        }
+
+        .chat-fab.is-open {
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 4px 18px rgba(0, 0, 0, 0.28);
+        }
+
+        .chat-fab-patient.is-open {
+            box-shadow: 0 0 0 4px rgba(26, 86, 219, 0.35), 0 4px 18px rgba(0, 0, 0, 0.28);
+        }
+
+        .chat-fab-manager.is-open {
+            box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.35), 0 4px 18px rgba(0, 0, 0, 0.28);
+        }
+
+        /* Floating panel */
+        .chat-float-panel {
+            position: fixed;
+            bottom: 24px;
+            right: 92px;
+            width: 420px;
+            height: calc(100vh - 90px);
+            min-height: 480px;
+            z-index: 9995;
+            border-radius: 16px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.9) translateX(16px);
+            transform-origin: bottom right;
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.34, 1.46, 0.64, 1);
+        }
+
+        .chat-float-panel.panel-open {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            pointer-events: all;
+        }
+
+        .chat-panel-header {
+            flex-shrink: 0;
+            height: 44px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            user-select: none;
+        }
+
+        .chat-panel-patient .chat-panel-header {
+            background: #1a56db;
+        }
+
+        .chat-panel-manager .chat-panel-header {
+            background: #198754;
+        }
+
+        .panel-close-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1rem;
+            padding: 0 2px;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+
+        .panel-close-btn:hover {
+            color: #fff;
+        }
+
+        .panel-resize-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.85rem;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+
+        .panel-resize-btn:hover {
+            color: #fff;
+        }
+
+        .chat-panel-iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #f8f9fa;
+            display: block;
+        }
+
+        .chat-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.18);
+            z-index: 9989;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s;
+        }
+
+        .chat-backdrop.backdrop-on {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .chat-float-panel.panel-wide {
+            width: min(700px, calc(100vw - 110px));
+        }
+
+        @media (max-width: 560px) {
+            .chat-float-panel {
+                width: calc(100vw - 16px);
+                right: 8px;
+                bottom: 84px;
+                height: calc(100vh - 110px);
+                border-radius: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body style="padding-top: 56px;">
+    <!-- Navbar (identical structure to project3) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark-blue fixed-top">
+        <div class="container-fluid px-4">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a href="/" class="navbar-brand mb-0 mx-2">
+                <img src="{{ request.url_for('static', path='images/logo.png') }}" alt="Megafy"
+                    style="height:40px;background-color:white;padding:8px 12px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/patient" id="nav-patient">
+                            <i class="bi bi-person-walking me-1"></i>Paciente
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/manager" id="nav-manager">
+                            <i class="bi bi-layout-text-window-reverse me-1"></i>Gestión de Colas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Image (same as project3) -->
+    {% block hero %}
+    <div class="hero-section">
+        <img src="{{ request.url_for('static', path='images/hero.jpg') }}" alt="Hospital Hero Banner"
+            class="hero-image">
+    </div>
+    {% endblock %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ═══════════════════════════════════════════
+         Floating chat panels
+    ═══════════════════════════════════════════ -->
+
+    <!-- Dim backdrop -->
+    <div class="chat-backdrop" id="chatBackdrop" onclick="closeAllChatPanels()"></div>
+
+    <!-- Patient chatbot panel (inline, not iframe) -->
+    <div class="chat-float-panel chat-panel-patient" id="chatPanel_patient">
+        <div class="chat-panel-header">
+            <i class="bi bi-chat-dots-fill"></i>
+            Asistente de Cola
+            <button class="panel-resize-btn" onclick="toggleWideMode('patient')" title="Ampliar / reducir">
+                <i class="bi bi-arrows-fullscreen" id="resizeIcon_patient"></i>
+            </button>
+            <button class="panel-close-btn" onclick="closeChatPanel('patient')" title="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <!-- Chat body injected by patient_queue.js -->
+        <div id="patientChatBody" style="flex:1;display:flex;flex-direction:column;overflow:hidden;"></div>
+    </div>
+
+    <!-- Manager agent panel (iframe, lazy-loaded — same as project3) -->
+    <div class="chat-float-panel chat-panel-manager" id="chatPanel_manager">
+        <div class="chat-panel-header">
+            <i class="bi bi-bar-chart-line-fill"></i>
+            Manager Agent
+            <button class="panel-resize-btn" onclick="toggleWideMode('manager')" title="Ampliar / reducir">
+                <i class="bi bi-arrows-fullscreen" id="resizeIcon_manager"></i>
+            </button>
+            <button class="panel-close-btn" onclick="closeChatPanel('manager')" title="Cerrar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <iframe class="chat-panel-iframe" id="chatFrame_manager" src="about:blank" title="Manager Agent"></iframe>
+    </div>
+
+    <!-- FAB stack (same layout as project3) -->
+    <div class="chat-fab-stack">
+        <button class="chat-fab chat-fab-manager" id="fab_manager" data-label="Manager Agent"
+            onclick="toggleChatPanel('manager')" title="Manager Agent">
+            <i class="bi bi-bar-chart-line-fill"></i>
+        </button>
+        <button class="chat-fab chat-fab-patient" id="fab_patient" data-label="Asistente de Cola"
+            onclick="toggleChatPanel('patient')" title="Asistente de Cola">
+            <i class="bi bi-chat-dots-fill"></i>
+        </button>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Active nav highlight -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname;
+            document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === path) link.classList.add('active');
+            });
+        });
+    </script>
+
+    <!-- Lightbox (same as project3 — needed for chart full-screen zoom) -->
+    <style>
+        .chart-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(10, 10, 20, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            cursor: zoom-out;
+            backdrop-filter: blur(4px);
+        }
+
+        .chart-lightbox.lightbox-open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+            transform: scale(0.88);
+            transition: transform 0.28s cubic-bezier(0.34, 1.46, 0.64, 1);
+            cursor: default;
+        }
+
+        .chart-lightbox.lightbox-open .lightbox-img {
+            transform: scale(1);
+        }
+
+        .lightbox-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+
+        .lightbox-close-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    </style>
+
+    <div class="chart-lightbox" id="chartLightbox" onclick="closeLightbox(event)">
+        <button class="lightbox-close-btn" onclick="closeLightbox()" title="Cerrar (Esc)">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <img id="lightboxImg" class="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Floating panel controller (mirrors project3 logic) -->
+    <script>
+        // Manager agent iframe URL
+        const MANAGER_EMBED_URL = '/manager-agent/embed';
+
+        function toggleChatPanel(type) {
+            const panel = document.getElementById(`chatPanel_${type}`);
+            panel.classList.contains('panel-open') ? closeChatPanel(type) : openChatPanel(type);
+        }
+
+        function openChatPanel(type) {
+            const other = type === 'patient' ? 'manager' : 'patient';
+            closeChatPanel(other);
+
+            const panel = document.getElementById(`chatPanel_${type}`);
+            panel.classList.add('panel-open');
+            document.getElementById(`fab_${type}`).classList.add('is-open');
+            document.getElementById('chatBackdrop').classList.add('backdrop-on');
+
+            // Lazy-load manager iframe the first time
+            if (type === 'manager') {
+                const iframe = document.getElementById('chatFrame_manager');
+                if (!iframe.dataset.loaded) {
+                    iframe.src = MANAGER_EMBED_URL;
+                    iframe.dataset.loaded = '1';
+                }
+            }
+
+            // Trigger inline patient chatbot init
+            if (type === 'patient' && typeof initPatientChat === 'function') {
+                initPatientChat();
+            }
+        }
+
+        function closeChatPanel(type) {
+            document.getElementById(`chatPanel_${type}`).classList.remove('panel-open');
+            document.getElementById(`fab_${type}`).classList.remove('is-open');
+            if (!document.querySelector('.chat-float-panel.panel-open')) {
+                document.getElementById('chatBackdrop').classList.remove('backdrop-on');
+            }
+        }
+
+        function closeAllChatPanels() {
+            ['patient', 'manager'].forEach(t => {
+                document.getElementById(`chatPanel_${t}`).classList.remove('panel-open');
+                document.getElementById(`fab_${t}`).classList.remove('is-open');
+            });
+            document.getElementById('chatBackdrop').classList.remove('backdrop-on');
+        }
+
+        function toggleWideMode(type) {
+            const panel = document.getElementById(`chatPanel_${type}`);
+            const icon = document.getElementById(`resizeIcon_${type}`);
+            panel.classList.toggle('panel-wide');
+            icon.className = panel.classList.contains('panel-wide') ? 'bi bi-fullscreen-exit' : 'bi bi-arrows-fullscreen';
+        }
+
+        // Lightbox helpers
+        function openLightbox(src, alt) {
+            const lb = document.getElementById('chartLightbox');
+            const img = document.getElementById('lightboxImg');
+            img.src = src; img.alt = alt || '';
+            lb.classList.add('lightbox-open');
+        }
+        function closeLightbox(e) {
+            if (e && e.target !== document.getElementById('chartLightbox')) return;
+            document.getElementById('chartLightbox').classList.remove('lightbox-open');
+        }
+
+        // Receive postMessage from iframe (chart image click)
+        window.addEventListener('message', e => {
+            if (e.data && e.data.type === 'openLightbox') {
+                openLightbox(e.data.src, e.data.alt || '');
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeAllChatPanels();
+                document.getElementById('chartLightbox').classList.remove('lightbox-open');
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

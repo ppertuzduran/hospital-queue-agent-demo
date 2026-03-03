@@ -1,0 +1,319 @@
+/* ========================================
+   Global Styles and Variables
+   Adapted from project3 — same design system
+   ======================================== */
+:root {
+    --dark-blue: #020557;
+    --primary-blue: #0d6efd;
+    --light-gray: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-dark: #212529;
+    --text-muted: #6c757d;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--light-gray);
+    margin: 0;
+    padding: 0;
+}
+
+/* ========================================
+   Navbar  (identical to project3)
+   ======================================== */
+.navbar.bg-dark-blue {
+    background-color: var(--dark-blue) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.5rem 1rem;
+    transition: color 0.2s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover { color: #ffffff; }
+
+.navbar-dark .navbar-nav .nav-link.active {
+    color: #ffffff;
+    font-weight: 500;
+    border-bottom: 2px solid #ffffff;
+}
+
+/* ========================================
+   Hero Section  (identical to project3)
+   ======================================== */
+.hero-section {
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+    background-color: #e9ecef;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* ========================================
+   Main Content
+   ======================================== */
+.main-content {
+    min-height: calc(100vh - 320px - 56px);
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+/* ========================================
+   Table Card  (identical to project3)
+   ======================================== */
+.table-card {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.table { margin-bottom: 0; }
+
+.table thead tr { background-color: #f8f9fa; }
+
+.table thead th {
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.75rem 0.5rem;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table tbody tr { transition: background-color 0.15s; }
+.table tbody tr:hover { background-color: #f8f9fa; }
+
+.table tbody td {
+    padding: 0.75rem 0.5rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ========================================
+   Table Footer / Pagination
+   ======================================== */
+.table-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   Modal Styles  (identical to project3)
+   ======================================== */
+.modal-header {
+    background-color: var(--dark-blue);
+    color: white;
+}
+
+.modal-header .btn-close { filter: invert(1); }
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-body .form-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Action buttons in table rows */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.btn-action:hover        { color: var(--primary-blue); }
+.btn-action.btn-call:hover  { color: #0dcaf0; }
+.btn-action.btn-serve:hover { color: #198754; }
+
+/* ========================================
+   Status Badges
+   ======================================== */
+.badge-status { font-size: 0.75rem; padding: 0.35em 0.65em; }
+
+.badge-esperando { background-color: #fff3cd; color: #856404; border: 1px solid #ffecb5; }
+.badge-llamado   { background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe; }
+.badge-atendido  { background-color: #d1e7dd; color: #0a3622; border: 1px solid #a3cfbb; }
+
+/* ========================================
+   Chat Widget (inside floating panel)
+   ======================================== */
+.queue-chat-root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+}
+
+.queue-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    scroll-behavior: smooth;
+}
+
+.queue-chat-messages::-webkit-scrollbar { width: 6px; }
+.queue-chat-messages::-webkit-scrollbar-track { background: #f1f1f1; }
+.queue-chat-messages::-webkit-scrollbar-thumb { background: #bbb; border-radius: 3px; }
+.queue-chat-messages::-webkit-scrollbar-thumb:hover { background: #888; }
+
+.queue-chat-input {
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid #dee2e6;
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Message bubbles */
+.chat-msg { margin-bottom: 0.75rem; animation: fadeIn 0.25s ease-in; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.chat-msg-row-user      { display: flex; justify-content: flex-end; }
+.chat-msg-row-assistant { display: flex; justify-content: flex-start; }
+
+.chat-bubble {
+    max-width: 78%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.chat-bubble-user {
+    background: #0d6efd;
+    color: #fff;
+    border-bottom-right-radius: 0.25rem;
+    margin-left: auto;
+}
+
+.chat-bubble-assistant {
+    background: #fff;
+    color: #212529;
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 0.25rem;
+}
+
+/* Typing indicator */
+.typing-indicator { display: flex; gap: 4px; padding: 6px 2px; }
+.typing-indicator span {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #6c757d; animation: typing 1.4s infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30%            { opacity: 1;   transform: translateY(-4px); }
+}
+
+/* ========================================
+   Queue row highlight for "Llamado"
+   ======================================== */
+tr.row-llamado td { background-color: #e7f3ff !important; }
+tr.row-atendido td { background-color: #f0f9f2 !important; }
+
+/* Live-wait counter: orange text + pulsing dot for Esperando/Llamado */
+.live-wait {
+    color: #d97706;
+    font-weight: 600;
+}
+.live-wait::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d97706;
+    margin-right: 5px;
+    vertical-align: middle;
+    animation: livePulse 1.6s ease-in-out infinite;
+}
+@keyframes livePulse {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%       { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* Reorder buttons */
+.btn-reorder {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    border-radius: 4px;
+}
+
+/* ========================================
+   Empty state
+   ======================================== */
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+    .hero-section  { height: 200px; }
+    .page-title    { font-size: 1.25rem; }
+    .table thead th,
+    .table tbody td { font-size: 0.75rem; padding: 0.5rem 0.25rem; }
+}
+
+@media (max-width: 576px) {
+    .table-responsive { font-size: 0.7rem; }
+}
