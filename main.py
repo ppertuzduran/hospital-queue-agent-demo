@@ -27,6 +27,12 @@ import seaborn as sns
 # ──────────────────────────────────────────────
 app = FastAPI(title="Gestión de Colas", version="1.0.0")
 
+# Trust Railway (and any reverse-proxy) forwarded headers so that
+# request.url_for() generates https:// URLs in production.
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
+
 BASE_DIR = os.path.dirname(__file__)
 DB_FILE = os.path.join(BASE_DIR, "data", "db.json")
 os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
